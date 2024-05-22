@@ -10,19 +10,19 @@ Subsequently, the LRPE module is integrated into a contrastive learning framewor
 # Installation
 A suitable conda environment named CL-LRPE can be created and activated with:
 
-'''bash
+```bash
 conda env create -n CL-LRPE python=3.8.1
 conda activate mage
-'''
+```
 
 Download the code
 
-'''bash
+```bash
 git clone https://anonymous.4open.science/r/CL-LRPE-631C/
 cd CL-LRPE 
-'''
+```
 
 Install environment
-'''bash
+```bash
 pip install -r requirements.txt
-'''
+```
