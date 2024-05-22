@@ -12,7 +12,7 @@ A suitable conda environment named CL-LRPE can be created and activated with:
 
 ```bash
 conda env create -n CL-LRPE python=3.8.1
-conda activate mage
+conda activate CL-LRPE 
 ```
 
 Download the code
