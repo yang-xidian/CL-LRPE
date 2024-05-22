@@ -1,4 +1,4 @@
-#Self-supervised Contrastive Learning for Heterogeneous Graph with Latent Recurring Pattern Embedding
+# Self-supervised Contrastive Learning for Heterogeneous Graph with Latent Recurring Pattern Embedding
 
 
 Recurring patterns, which denote semantic relations frequently occurring among nodes within a heterogeneous graph, encapsulate rich semantic information crucial for modeling semantic relations. Previous approaches have relied on manual design or annotation of recurring patterns, such as meta-paths and motif substructures, to discriminate and focus on homogeneous nodes, limiting their utility in unsupervised graph representation learning.To overcome this limitation, we propose a self-supervised Contrastive Learning framework with Latent Recurring Pattern Embedding (CL-LRPE) to learn semantic relations in heterogeneous graphs and facilitate node discrimination.  Initially, we propose a novel Latent Recurring Pattern Embedding (LRPE) module to capture the common semantic relations therein across the subgraphs in an unsupervised manner and integrate them into node representation.
