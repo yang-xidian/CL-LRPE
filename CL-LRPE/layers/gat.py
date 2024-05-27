@@ -43,7 +43,7 @@ class GAT(nn.Module):
     def __init__(self, in_ft, out_ft, act, bias=True):
         super(GAT, self).__init__()
         self.fc = nn.Linear(in_ft, out_ft, bias=False)
-        self.act = nn.PReLU() if act == 'prelu' else act           #这样写当激活函数选择不是prelu的话还是无法创建激活函数
+        self.act = nn.PReLU() if act == 'prelu' else act        
         self.conv = tg.nn.GATConv(out_ft, out_ft)
         # self.conv = tg.nn.GCNConv(out_ft, out_ft)
         # self.conv = tg.nn.SAGEConv(out_ft, out_ft)
@@ -58,8 +58,8 @@ class GAT(nn.Module):
             self.weights_init(m)
 
     def weights_init(self, m):
-        if isinstance(m, nn.Linear):           #判断m是否为linear层
-            torch.nn.init.xavier_uniform_(m.weight.data)  #预防一些参数过大或过小的情况，再保证方差一样的情况下进行缩放，便于计算
+        if isinstance(m, nn.Linear):          
+            torch.nn.init.xavier_uniform_(m.weight.data)  
             if m.bias is not None:
                 m.bias.data.fill_(0.0)
 
