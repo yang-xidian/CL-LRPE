@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch_geometric as tg
 import pdb
 
-#包含一层线性层和一层GAT层
+
 class LinearModel(nn.Module):
     def __init__(self, ft_in, nb_classes):
         super(LinearModel, self).__init__()
