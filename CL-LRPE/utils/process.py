@@ -116,9 +116,9 @@ def load_data(dataset_str): # {'pubmed', 'citeseer', 'cora'}
     if dataset_str not in ['cora', 'citeseer', 'pubmed', 'reddit']:
 
         from utils.geom_data_utils import load_geom_datasets
-        # adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, nothing1, nothing2 = load_geom_datasets(dataset_str, 9) #第二个参数是随机种子
-        adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, nothing1, nothing2 = load_geom_datasets(dataset_str, 6) #第二个参数是随机种子
-        adj, features = preprocess_citation(adj, features, "NoNorm") #这里尝试用preprocess_citation处理异构图数据的adj，也想为其添加属性row和col
+        # adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, nothing1, nothing2 = load_geom_datasets(dataset_str, 9) 
+        adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, nothing1, nothing2 = load_geom_datasets(dataset_str, 6) 
+        adj, features = preprocess_citation(adj, features, "NoNorm") 
         train_adj = adj
         train_features = features
         # return adj, train_adj, features, train_features, labels, idx_train, idx_val, idx_test, None, None
