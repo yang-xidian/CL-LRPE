@@ -5,7 +5,7 @@ import pdb
 class Discriminator(nn.Module):
     def __init__(self, n_h):
         super(Discriminator, self).__init__()
-        self.f_k = nn.Bilinear(n_h, n_h, 1)   #双向线性层
+        self.f_k = nn.Bilinear(n_h, n_h, 1)   
 
         for m in self.modules():
             self.weights_init(m)
@@ -20,7 +20,7 @@ class Discriminator(nn.Module):
         # print('c:', c.shape) # (1, 512) -> (512)
         # c_x = torch.unsqueeze(c, 1) # (1, 1, 512)
 
-        # c_x = c_x.expand_as(h_pl) #这一行在cora数据集上得用！
+        # c_x = c_x.expand_as(h_pl)
 
         # c_x = c.expand_as(h_pl) # (2708, 512)
 
@@ -33,8 +33,8 @@ class Discriminator(nn.Module):
         # pdb.set_trace()
         # sc_1 = torch.squeeze(self.f_k(h_pl, c_x), 2) # (1, 2708)
         # sc_2 = torch.squeeze(self.f_k(h_mi, c_x), 2) # (1, 2708)
-        sc_1 = torch.squeeze(self.f_k(h_pl, c_x), 1) #(2708)            #这里squeeze维度压缩，删除掉所有大小为1的维度
-        sc_2 = torch.squeeze(self.f_k(h_mi, c_x), 1) #(2708)            #当给定 dim 时，那么只在给定的维度（dimension）上进行压缩操作。
+        sc_1 = torch.squeeze(self.f_k(h_pl, c_x), 1) #(2708)            
+        sc_2 = torch.squeeze(self.f_k(h_mi, c_x), 1) #(2708)           
         # print(sc_1.shape)                
         # pdb.set_trace()
 
