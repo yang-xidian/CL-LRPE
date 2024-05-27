@@ -32,7 +32,7 @@ def get_target_random_walks(args, adj):
     return walks
 
 
-def graph_random_walks(args, graph): #这个函数涉及随机游走操作
+def graph_random_walks(args, graph): 
 
     for edge in graph.edges():
         graph[edge[0]][edge[1]]['weight'] = 1
@@ -95,7 +95,7 @@ def choose_next_node(current_node, previous_node, neighbors, graph, p, q):
     weights = np.array(weights)
     weights /=  weights.sum()
 
-    # 根据权重随机选择下一个节点
+   
     return random.choice(neighbors, p=weights)
 
 
@@ -107,10 +107,10 @@ def random_walk(start_node, graph, walk_length, p, q):
 
         if len(neighbors) > 0:
             if len(walk) == 1:
-                # 随机选择下一个节点，考虑 BFS 的情况
+                
                 next_node = random.choice(neighbors)
             else:
-                # 根据 p 和 q 权重选择下一个节点
+             
                 next_node = choose_next_node(current_node, walk[-2], neighbors, graph, p, q)
 
             walk.append(next_node)
