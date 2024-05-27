@@ -261,45 +261,52 @@ tot = tot.to(device)
 
 accs = []
 
-for _ in range(5): #5次实验取平均
-    #log = LogReg(hid_units, nb_classes) # linear model 512 -> 7
-    log = MLP(num_layers=4, input_dim=hid_units, hidden_dim=int(hid_units/2), output_dim=nb_classes)
-    opt = torch.optim.Adam(log.parameters(), lr=0.0001, weight_decay=0.0)
-    # log.cuda()
-    log.to(device)
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_validate
+def get_all_cv_score(emb, G, G_label, clf):
+    ratios = [0.1, 0.3, 0.5, 0.7, 0.9]
+    tot = 0
+    for i in clf:  # svc_linear,svc_rbf,
+        k = []
+        k1 = []
+        print(i)
+        for test_size in tqdm_notebook(ratios):
+            train, test, train_label, test_label = train_test_split(
+                emb,
+                G_label,
+                test_size=1 - test_size)
+            try:
+#                 print('try:',train.shape)
+                scores_clf = cross_validate(i,
+                                            train,
+                                            train_label,
+                                            cv=5,
+                                            scoring=['f1_micro', 'f1_macro'],
+                                            n_jobs=10,
+                                            verbose=0)
+            except:
+#                 print('except:',train.shape)
+                scores_clf = cross_validate(i,
+                                            train,
+                                            train_label,
+                                            cv=5,
+                                            scoring=['f1_micro', 'f1_macro'],
+                                            n_jobs=10,
+                                            verbose=0)
+            k.append([scores_clf['test_f1_micro'].mean(),
+                    scores_clf['test_f1_micro'].std() * 2,
+                    scores_clf['test_f1_macro'].mean(),
+                    scores_clf['test_f1_macro'].std() * 2])
+    return k
 
-    pat_steps = 0
-    best_acc = torch.zeros(1)
-    # best_acc = best_acc.cuda()
-    best_acc = best_acc.to(device)
-    for _ in range(50): #texas
-    #for _ in range(9):
-        log.train()
-        opt.zero_grad()
 
-        logits = log(train_embs)
-        pred = torch.argmax(logits, dim=1)
-        train_acc = torch.sum(pred == train_lbls).float() / train_lbls.shape[0]
-        #print('train_acc:', train_acc)
-        loss = xent(logits, train_lbls) 
-        # print(loss)
-        # pdb.set_trace()
-
-        loss.backward()
-        opt.step()
-
-    logits = log(test_embs)
-    preds = torch.argmax(logits, dim=1)
-    print(preds)
-    print(test_lbls)
-    acc = torch.sum(preds == test_lbls).float() / test_lbls.shape[0]
-    accs.append(acc * 100)
-    print(acc)
-    tot += acc
-
-print('Average accuracy:', tot / 10)
-
-accs = torch.stack(accs)
-print(accs.mean())
-print(accs.std())
+node_embedding = embeds.cpu().detach().numpy()
+node_embedding = pd.DataFrame(node_embedding)
+lab = np.argmax(labels.cpu().detach().numpy(), axis=1)
+k = get_all_cv_score(node_embedding, G, lab, [LogisticRegression(n_jobs=10)])
+tr = pd.DataFrame(k).T
+ratios = [0.1, 0.3, 0.5, 0.7, 0.9]
+tr.columns = ['ratio {}'.format(j) for j in ratios]
+tr.index = ['train-micro', 'micro-std','train-macro','macro-std']
+print(tr)
 
