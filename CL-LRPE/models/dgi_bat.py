@@ -60,10 +60,9 @@ class DGI(nn.Module):
         # print(c_out.shape)
         # pdb.set_trace()
         # ret = self.disc(c, h_1, h_2, samp_bias1, samp_bias2)
-        ret = self.disc(c_out, h_1, h_2, samp_bias1, samp_bias2) #discriminator得到的输出，用于计算loss的
-
+        ret = self.disc(c_out, h_1, h_2, samp_bias1, samp_bias2)
         # Decoder 部分
-        feature_loss = self.feature_loss_func(seq1, self.feature_decoder(h_1)) # feature层面的decoder
+        feature_loss = self.feature_loss_func(seq1, self.feature_decoder(h_1)) 
 
         return ret, feature_loss
 
