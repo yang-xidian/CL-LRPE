@@ -24,8 +24,8 @@ class GCN(nn.Module):
                 m.bias.data.fill_(0.0)
 
     # Shape of seq: (batch, nodes, features)
-    #为什么这里没有特征传播函数和特征聚合函数只是对输入做了一层非线性映射
-    def forward(self, seq, adj, sparse=False):  #如果没有加sparse=False返回结果为稀疏矩阵（将非0值按位置表示出来）
+   
+    def forward(self, seq, adj, sparse=False):  
         # print('seq:', seq.shape) # (2708, 1433)
         seq_fts = self.fc(seq)
         # print('seq_fts', seq_fts.shape) # (2708, 512)
@@ -36,9 +36,9 @@ class GCN(nn.Module):
         if sparse:
             # out = torch.unsqueeze(torch.spmm(adj, torch.squeeze(seq_fts, 0)), 0)
             # out = torch.spmm(adj, torch.squeeze(seq_fts, 0))
-            out = torch.spmm(adj, seq_fts)    #矩阵乘法
+            out = torch.spmm(adj, seq_fts)   
         else:
-            out = torch.bmm(adj, seq_fts)    #计算两个tensor矩阵乘法
+            out = torch.bmm(adj, seq_fts)    
         if self.bias is not None:
             out += self.bias
         # print('out:', out.shape) # (2708, 512)
