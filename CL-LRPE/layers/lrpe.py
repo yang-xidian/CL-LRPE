@@ -35,7 +35,7 @@ class LRPE(nn.Module):
     #def forward(self, features, all_subgraph_list, subgraph_fea, tmp):
     def forward(self, features, subgraph_fea, tmp):
         '''self.all_subgraph_feature_list = []
-        self.subg_length = [] #记录一个序列中子图的个数
+        self.subg_length = [] 
 
         for subgraph_list in all_subgraph_list:
             
@@ -54,7 +54,7 @@ class LRPE(nn.Module):
         subgraph_feature_downscaling = torch.stack(subgraph_feature_downscaling, dim=0)
         '''
         all_subgraph_fea = []
-        self.subg_length = [] #记录一个序列中子图的个数
+        self.subg_length = [] 
         for t in tmp:
             all_subgraph_fea.append(subgraph_fea[t])
             self.subg_length.append(len(t))
@@ -66,7 +66,7 @@ class LRPE(nn.Module):
         pattern_information_unpack = pad_packed_sequence(pattern_information[0], batch_first=True)
         
         node_pattern_information = []
-        for v in pattern_information_unpack[0]:  #这里用的是简单做法，把每个序列中的第0个向量直接作为该目标节点的图案特征
+        for v in pattern_information_unpack[0]:  
             node_pattern_information.append(v[0])
 
         node_pattern_information = torch.stack(node_pattern_information, dim=0)
