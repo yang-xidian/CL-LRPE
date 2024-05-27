@@ -32,7 +32,7 @@ class MOST(nn.Module):
 
 
 
-    #subgraph是经过random walk后得到的序列，subgraph2是随机生成的序列
+  
     def forward(self, seq1, subgraph, adj, sparse, msk, samp_bias1, samp_bias2):
         h_1_l1, h_1_l2, c_out = self.gcn(seq1, subgraph, adj) 
 
