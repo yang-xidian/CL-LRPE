@@ -77,28 +77,28 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
             for line in graph_adjacency_list_file:
                 line = line.rstrip().split('\t')
                 assert (len(line) == 2)
-                if int(line[0]) not in G: #把节点添加到networkx中
+                if int(line[0]) not in G: 
                     G.add_node(int(line[0]), features=graph_node_features_dict[int(line[0])],
                                label=graph_labels_dict[int(line[0])])
-                if int(line[1]) not in G:  #把节点添加到networkx中
+                if int(line[1]) not in G:  
                     G.add_node(int(line[1]), features=graph_node_features_dict[int(line[1])],
                                label=graph_labels_dict[int(line[1])])
                 G.add_edge(int(line[0]), int(line[1])) 
-                # G.add_edge(int(line[1]), int(line[0])) #注释掉了，添加有向图
+                # G.add_edge(int(line[1]), int(line[0])) 
 
-        adj = nx.adjacency_matrix(G, sorted(G.nodes())) # G的邻接矩阵 Scipy sparse matrix
+        adj = nx.adjacency_matrix(G, sorted(G.nodes())) #  Scipy sparse matrix
         # print(adj)
         # pdb.set_trace()
         features = np.array(
-            [features for _, features in sorted(G.nodes(data='features'), key=lambda x: x[0])]) # 把features按照对应的id排序
+            [features for _, features in sorted(G.nodes(data='features'), key=lambda x: x[0])]) 
         labels = np.array(
-            [label for _, label in sorted(G.nodes(data='label'), key=lambda x: x[0])])  # 把label按照对应的id排序
+            [label for _, label in sorted(G.nodes(data='label'), key=lambda x: x[0])])  
 
     assert (features == 1).sum() == len(features.nonzero()[0])
 
     features = geom_utils.preprocess_features(features) # 把feature normalize
 
-    splits_file_path = None #我在这里加一步这个，让数据集随机划分试试
+    splits_file_path = None 
 
     #train_percentage = 0.8
     #val_percentage = 0.1
@@ -111,20 +111,15 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
 
     print(train_percentage, val_percentage)
 
-    #通过随机种子，固定数据集划分
+  
     import torch
-    # seed = 7 # wisconsin数据集下 0.7 - 0.15 -0.15 seed = 7效果最佳？ 0.7368;  seed = 5时 0.8158!, seed = 3时, 0.8 - 0.1 - 0.1 达到0.8077的效果
-    # seed = 5 # actor best
-    # seed = 5 # cornell 数据集下 0.8 - 0.1 - 0.1 seed = 1效果最佳？ 0.6842  6: 0.6316  9: 0.6842
-    # seed = 5 # film数据集下 seed = 5, split: 0.9 - 0.05 - 0.05 最佳？
-    seed = 0 # wisconsin数据集下效果最佳 seed = 28, split: 0.9 - 0.05 - 0.05, 达到0.7692的效果; seed = 6, split: 0.9 - 0.05 - 0.05 达到0.6923的效果
-                # film 在seed = 103时，效果也好
+   
     
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     np.random.seed(seed)
 
-    if splits_file_path: # 把splits底下的随机划分训练集、测试集、验证集进行加载
+    if splits_file_path:
         with np.load(splits_file_path) as splits_file:
             train_mask = splits_file['train_mask']
             val_mask = splits_file['val_mask']
@@ -165,8 +160,7 @@ def load_data(dataset_name, splits_file_path=None, train_percentage=None, val_pe
             train_and_val_index, test_index = next(
                 ShuffleSplit(n_splits=1, train_size=train_percentage + val_percentage).split(
                     np.empty_like(labels), labels))
-            #下面这两行是将数据集划分成训练集+验证集 和 测试集后, 在训练+验证集上, 按照训练集的比例乘上 训练验证的比例
-            # 感觉不太合理,比如训练集是0.7,验证集是0.15,那么最后训练集的比例是 (0.7 + 0.15) * 0.7 = 0.59?
+          
             # train_index, val_index = next(ShuffleSplit(n_splits=1, train_size=train_percentage).split(
             #     np.empty_like(labels[train_and_val_index]), labels[train_and_val_index])) 
 
