@@ -96,10 +96,10 @@ class DGI(nn.Module):
         # print(c_out.shape)
         # pdb.set_trace()
         # ret = self.disc(c, h_1, h_2, samp_bias1, samp_bias2)
-        ret = self.disc(c_out, h_1, h_2, samp_bias1, samp_bias2) #discriminator得到的输出，用于计算loss的
+        ret = self.disc(c_out, h_1, h_2, samp_bias1, samp_bias2) 
 
         # Decoder 部分
-        feature_loss = self.feature_loss_func(seq1, self.feature_decoder(h_1)) # feature层面的decoder
+        feature_loss = self.feature_loss_func(seq1, self.feature_decoder(h_1)) 
 
         return ret, feature_loss
     
@@ -107,17 +107,17 @@ class DGI(nn.Module):
         value = torch.matmul(z, torch.matmul(self.weight, s_z))
         return torch.sigmoid(value)
     
-    #subgraph是经过random walk后得到的序列，subgraph2是随机生成的序列
+    
     #def forward(self, seq1, neg, all_subgraph_list, tmp, adj, sparse, msk, samp_bias1, samp_bias2):
     def forward(self, seq1, neg, tmp, adj, sparse, msk, samp_bias1, samp_bias2):
-        h_1_l1, h_1_l2, c_out = self.LSTM(seq1, self.subgraph, adj) #注意！ 这里h_1_l1是经过一层双向LSTM和一层linear后输出的特征，h_1_l2是再经过一层LSTM后输出的
+        h_1_l1, h_1_l2, c_out = self.LSTM(seq1, self.subgraph, adj) 
         
         fea_subgraph = self.gcn(seq1, adj, True)
         fea_subgraph = self.gcn2(fea_subgraph, adj, True)
         
         #pattern_information = self.lrpe(seq1, all_subgraph_list, fea_subgraph, tmp)
         pattern_information = self.lrpe(seq1, fea_subgraph, tmp)
-                                                                  #输出的特征，c_out是求均值后的特征
+                                                                 
         c = self.read(h_1_l1, msk) # (1, 512) #(512)
         c = self.sigm(c)
 
@@ -138,7 +138,7 @@ class DGI(nn.Module):
     
         fea = self.fea_agg(new_input)
         
-        ret = self.disc(c_out, h_1_l1, h_neg, samp_bias1, samp_bias2) #discriminator得到的输出，用于计算loss的
+        ret = self.disc(c_out, h_1_l1, h_neg, samp_bias1, samp_bias2) 
 
         # return ret, None
         #sf = self.sfea(seq1)
