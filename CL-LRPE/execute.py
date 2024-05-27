@@ -48,7 +48,7 @@ device = torch.device('cuda:1')
 # torch.backends.cudnn.deterministic = True
 
 
-adj, features, labels, idx_train, idx_val, idx_test = process.load_data(dataset) #邻接矩阵，特征，标签，训练集，验证集，测试集
+adj, features, labels, idx_train, idx_val, idx_test = process.load_data(dataset)
 #features, _ = process.preprocess_features(features)
 
 #print(adj)
@@ -57,9 +57,9 @@ adj, features, labels, idx_train, idx_val, idx_test = process.load_data(dataset)
 #print(idx_val)
 #print(idx_test)
 
-# edge_index = adj._indices() # train_adj本身就是以稀疏矩阵的方式存储的，因此直接调用indices()就能得到边了
+# edge_index = adj._indices()
 
-#对图中每个节点计算random walkssh
+#random walkssh
 subgraph = path.get_target_random_walks(args, adj)
 adj_1 = adj
 #subgraph = path.k_hop_neighborhood(args, adj)
@@ -74,27 +74,27 @@ print(type(subgraph))
 
 
 
-nb_nodes = features.shape[0]   #节点数量
-ft_size = features.shape[1]    #特征大小
+nb_nodes = features.shape[0]   
+ft_size = features.shape[1]    
 # print(nb_nodes)
 # print(ft_size)
 #nb_classes = labels.shape[1]
 nb_classes = max(labels) + 1
 
 
-adj = process.normalize_adj(adj + sp.eye(adj.shape[0]))  #对称归一化矩阵
+adj = process.normalize_adj(adj + sp.eye(adj.shape[0]))  
 
 
 if sparse:
     sp_adj = process.sparse_mx_to_torch_sparse_tensor(adj)
 else:
-    adj = (adj + sp.eye(adj.shape[0])).todense()  #adj + sp.eye(adj.shape[0])表示加入自连接
+    adj = (adj + sp.eye(adj.shape[0])).todense()  #adj + sp.eye(adj.shape[0])
 # print(features[np.newaxis].shape)
 
-#features = torch.FloatTensor(features[np.newaxis]) #np.newaxis是给features前面加上一个维度
+#features = torch.FloatTensor(features[np.newaxis]) 
 
 features = torch.FloatTensor(features)
-#余弦相似度取负样本
+
 gfeatures = features / torch.norm(features, dim=-1, keepdim=True)
 cosine_similarities = torch.mm(gfeatures, gfeatures.T)
 
@@ -126,9 +126,7 @@ def one_hot(x, class_count):
     return torch.eye(class_count)[x,:]
 labels = one_hot(labels, nb_classes)
 
-# print(labels.shape) # (1, 2708, 7) 改完变成 (2708, 7)
-# print(adj.shape) # (2708, 2708)
-# print(sp_adj.shape) #稀疏矩阵 (2708, 2708)
+
 # pdb.set_trace()
 
 # model = DGI(hid_units, hid_units, nonlinearity, subgraph)
@@ -161,8 +159,8 @@ if torch.cuda.is_available():
     idx_val = idx_val.to(device)
     idx_test = idx_test.to(device)
 
-b_xent = nn.BCEWithLogitsLoss() #二分类交叉熵损失函数，只能解决二分类问题 （前面会加上sigmoid函数）
-xent = nn.CrossEntropyLoss() #交叉熵损失函数，用于解决多分类问题 （内部会自动加上softmax层）
+b_xent = nn.BCEWithLogitsLoss() 
+xent = nn.CrossEntropyLoss()
 cnt_wait = 0
 best = 1e9
 best_t = 0
@@ -200,7 +198,7 @@ for epoch in range(nb_epochs):
     # lbl = torch.cat((lbl_1, lbl_2), 1) # (1, 5416)
     # print(idx)
     
-    neg = [[i] + [random.randint(0, nb_nodes - 1) for j in range(args.walk_length - 1)] for i in range(nb_nodes)] #随机构造节点游走序列
+    neg = [[i] + [random.randint(0, nb_nodes - 1) for j in range(args.walk_length - 1)] for i in range(nb_nodes)] 
     
     tmp = most_dissimlar_nodes.tolist()
     #for i in range(nb_nodes):
@@ -210,7 +208,7 @@ for epoch in range(nb_epochs):
     #for i in range(nb_nodes):
         #for j in range(27):
             #tmp[i][j+2] = random.randint(0, nb_nodes - 1)
-    # tmp = [[random.randint(0, nb_nodes - 1) for j in range(args.walk_length)] for i in range(nb_nodes)] #随机构造节点游走序列
+    # tmp = [[random.randint(0, nb_nodes - 1) for j in range(args.walk_length)] for i in range(nb_nodes)] 
     # print(tmp[0])
     # print(len(tmp), len(tmp[0]))
     # pdb.set_trace()
@@ -230,7 +228,7 @@ for epoch in range(nb_epochs):
     # loss_f = model(features, tmp, sp_adj if sparse else adj, sparse, None, None, None) #(1, 5416)
     # print(logits.shape) #(5416)
     # print(lbl.shape) #(5416)
-    loss_d = b_xent(logits, lbl) #前2708是原图得到的特征(positive 1)，后2708是扰动特征的图得到的特征(negative 0)
+    loss_d = b_xent(logits, lbl) 
     
     loss = loss_f
     loss = loss_f + 0.0005*loss_d
@@ -238,7 +236,7 @@ for epoch in range(nb_epochs):
     #print(loss_f, loss_d)
     #loss = loss_f + 0.0001*loss_d
     # loss = loss_d
-    #loss = loss_f #不可行 只用这一个效果不佳
+    #loss = loss_f 
 
     print('epoch: {} Loss: {}'.format(epoch, loss))
     # print(logits)
@@ -260,7 +258,7 @@ for epoch in range(nb_epochs):
     optimiser.step()
 
     end_time = time.perf_counter()
-    print('运行时间：', end_time-start_time)
+    print('runtime：', end_time-start_time)
 
 
 print('Loading {}th epoch'.format(best_t))
@@ -313,45 +311,53 @@ tot = tot.to(device)
 
 accs = []
 
-for _ in range(5): #5次实验取平均
-    #log = LogReg(hid_units, nb_classes) # linear model 512 -> 7
-    log = MLP(num_layers=4, input_dim=hid_units, hidden_dim=int(hid_units/2), output_dim=nb_classes)
-    opt = torch.optim.Adam(log.parameters(), lr=0.0001, weight_decay=0.0)
-    # log.cuda()
-    log.to(device)
 
-    pat_steps = 0
-    best_acc = torch.zeros(1)
-    # best_acc = best_acc.cuda()
-    best_acc = best_acc.to(device)
-    for _ in range(50): #texas
-    #for _ in range(9):
-        log.train()
-        opt.zero_grad()
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_validate
+def get_all_cv_score(emb, G, G_label, clf):
+    ratios = [0.1, 0.3, 0.5, 0.7, 0.9]
+    tot = 0
+    for i in clf:  # svc_linear,svc_rbf,
+        k = []
+        k1 = []
+        print(i)
+        for test_size in tqdm_notebook(ratios):
+            train, test, train_label, test_label = train_test_split(
+                emb,
+                G_label,
+                test_size=1 - test_size)
+            try:
+#                 print('try:',train.shape)
+                scores_clf = cross_validate(i,
+                                            train,
+                                            train_label,
+                                            cv=5,
+                                            scoring=['f1_micro', 'f1_macro'],
+                                            n_jobs=10,
+                                            verbose=0)
+            except:
+#                 print('except:',train.shape)
+                scores_clf = cross_validate(i,
+                                            train,
+                                            train_label,
+                                            cv=5,
+                                            scoring=['f1_micro', 'f1_macro'],
+                                            n_jobs=10,
+                                            verbose=0)
+            k.append([scores_clf['test_f1_micro'].mean(),
+                    scores_clf['test_f1_micro'].std() * 2,
+                    scores_clf['test_f1_macro'].mean(),
+                    scores_clf['test_f1_macro'].std() * 2])
+    return k
 
-        logits = log(train_embs)
-        pred = torch.argmax(logits, dim=1)
-        train_acc = torch.sum(pred == train_lbls).float() / train_lbls.shape[0]
-        #print('train_acc:', train_acc)
-        loss = xent(logits, train_lbls) 
-        # print(loss)
-        # pdb.set_trace()
 
-        loss.backward()
-        opt.step()
-
-    logits = log(test_embs)
-    preds = torch.argmax(logits, dim=1)
-    print(preds)
-    print(test_lbls)
-    acc = torch.sum(preds == test_lbls).float() / test_lbls.shape[0]
-    accs.append(acc * 100)
-    print(acc)
-    tot += acc
-
-print('Average accuracy:', tot / 10)
-
-accs = torch.stack(accs)
-print(accs.mean())
-print(accs.std())
+node_embedding = embeds.cpu().detach().numpy()
+node_embedding = pd.DataFrame(node_embedding)
+lab = np.argmax(labels.cpu().detach().numpy(), axis=1)
+k = get_all_cv_score(node_embedding, G, lab, [LogisticRegression(n_jobs=10)])
+tr = pd.DataFrame(k).T
+ratios = [0.1, 0.3, 0.5, 0.7, 0.9]
+tr.columns = ['ratio {}'.format(j) for j in ratios]
+tr.index = ['train-micro', 'micro-std','train-macro','macro-std']
+print(tr)
 
